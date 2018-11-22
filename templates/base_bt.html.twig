@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}
+        	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        	<link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
+
+        {% endblock %}
+    </head>
+    <body>
+    	<div id="main-container" class="container-fluid bg-dark text-light">
+	    	{% block header %}
+				<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+					<a class="navbar-brand" href="#">FFFGAMES</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse justify-content-between" id="navbarNavDropdown">	
+						<ul class="navbar-nav" style="margin: 0px;">
+							{% block header_center %}
+								<li class="nav-item {% block header_home_active %}{% endblock %}">
+									<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+								</li>
+								<li class="nav-item {% block header_news_active %}{% endblock %}">
+									<a class="nav-link" href="#">New on FFFGames <span class="sr-only">(current)</span></a>
+								</li>
+								<li class="nav-item {% block header_community_active %}{% endblock %}">
+									<a class="nav-link" href="/community">Community <span class="sr-only">(current)</span></a>
+								</li>																
+							{% endblock %}
+						</ul>											
+						<ul class="navbar-nav" style="margin: 0px; margin-right: 100px;">
+							{% block header_right %}
+								<li class="nav-item dropdown">
+								    <a class="nav-link dropdown-toggle" id="dropdown_user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><img width="25px" src="{{ asset('image/default-user.png') }}"></a>
+
+								    <div class="dropdown-menu" aria-labelledby="dropdown_user">        
+								        <a class="dropdown-item open_create_preferences">{{ 'Preferences'|trans }}</a>
+								        <hr />
+								        <a class="dropdown-item" href="/logout">{{ 'Log out'|trans }}</a>                                  
+								    </div>
+								</li>							
+							{% endblock %}
+						</ul>						
+					</div>
+				</nav>                
+        	{% endblock %}
+	        {% block body %}{% endblock %}
+	        {% block javascripts %}
+	        	<script src="{{ asset('https://code.jquery.com/jquery-3.2.1.min.js') }}"></script>
+	    	    <script src="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js') }}" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	    	    <script src="{{ asset('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js') }}" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+                <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
+	        {% endblock %}
+    	</div>
+    </body>
+</html>

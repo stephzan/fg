@@ -1,12 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+        	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        	<link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
+
+        {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+    	<div id="main-container" class="container-fluid bg-dark text-light">
+	    	{% block header %}
+                <div class="d-flex flex-row bg-dark text-light">
+                  <div class="p-3" style="width: 10%;">
+                    {% block header_left %}
+                        FFFGAMES
+                    {% endblock %}
+                  </div>
+                  <div class="mr-auto p-3">
+                    {% block header_center %}
+                        {{ 'INFO SERVER'|trans }}: <span id="info_nbplayer">0</span> {{ 'players'|trans }} | <span id="info_nbroom">0</span> {{ 'rooms'|trans }} | <span id="info_nbgame">0</span> {{ 'games'|trans }}
+                    {% endblock %}
+                  </div>
+                  <div class="p-2">
+                    {% block header_right %}                        
+                        <ul class="nav navbar">
+                            {% block header_right_list %}                        
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" id="dropdown_user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><img width="25px" src="{{ asset('image/default-user.png') }}"></a>
+
+                                    <div class="dropdown-menu" aria-labelledby="dropdown_user">
+                                        <a data-toggle="modal" data-target="#mod_room_create" class="dropdown-item open_create_room">{{ 'New room'|trans }}</a>
+                                        <a class="dropdown-item open_create_preferences">{{ 'Preferences'|trans }}</a>
+                                        <hr />
+                                        <a class="dropdown-item" href="/logout">{{ 'Log out'|trans }}</a>                                  
+                                    </div>
+                                </li>                        
+                            {% endblock %}
+                        </ul>
+                    {% endblock %}
+                  </div>
+                </div>
+        	{% endblock %}
+	        {% block body %}{% endblock %}
+	        {% block javascripts %}
+	        	<script src="{{ asset('https://code.jquery.com/jquery-3.2.1.min.js') }}"></script>
+	    	    <script src="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js') }}" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	    	    <script src="{{ asset('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js') }}" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+                <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
+	        {% endblock %}
+    	</div>
     </body>
 </html>

@@ -1,0 +1,15 @@
+<div class="container">
+	{% for user in userList %}
+		<div class="row player_list_row">
+			<div class="col">
+				<div class="row">
+					<strong>{{ user.username }}</strong>&nbsp;( Lobby )
+				</div>
+				<div class="row">
+					{{ 'Level:'|trans }} {{ user.getProfile().level }} | {{ 'Score:'|trans }} {{ user.getProfile().score }}
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+	<input type="hidden" id="hid_info_nbplayer" value="{{ nbUser }}" />
+</div>

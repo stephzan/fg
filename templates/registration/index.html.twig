@@ -1,0 +1,30 @@
+{% extends 'model_center_auth.html.twig' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block header_center %}{% endblock %}
+
+{% block header_right %}
+	<a href="/login">
+	    <button class="btn btn-md btn-outline-primary" type="">
+	        {{ "Login"|trans }}
+	    </button>
+	</a>
+{% endblock %}
+
+{% block form %}
+	{% form_theme form 'model_form_fields.html.twig' %}
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <h1 class="h3 mb-3 font-weight-normal">{{ 'Welcome to FGAMES'|trans }}</h1>
+    <h1 class="h5 mb-3 font-weight-normal">{{ 'Please fill the form below to join us'|trans }}</h1>
+
+	{{ form_start(form, {'attr':{'class':'center_form'}}) }}
+	    {{ form_widget(form) }}
+
+	    <button class="btn btn-lg btn-primary" type="submit">{{ 'Register!'|trans }}</button>
+	{{ form_end(form) }}    
+{% endblock %}
+

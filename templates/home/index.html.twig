@@ -1,0 +1,54 @@
+{% extends 'base_bt.html.twig' %}
+
+{% block title %}{{ controller_name }}!{% endblock %}
+
+{% block header_home_active %} {{ 'active' }} {% endblock %}
+
+{% block header_right %}		
+	<li class="nav-item dropdown">
+	    <a class="nav-link dropdown-toggle" id="dropdown_room" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><img width="25px" src="{{ asset('image/default-room.png') }}"></a>
+
+	    <div class="dropdown-menu" aria-labelledby="dropdown_room">	    	
+	    	{% if user.room is not null %}
+	        	<a class="dropdown-item">{{ 'Open my room'|trans }}</a>
+	        {% else %}
+				<a data-toggle="modal" data-target="#mod_room_create" class="dropdown-item open_create_room">{{ 'New room'|trans }}</a>
+	        {% endif %}
+	    </div>
+	</li>
+
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div class="row w-100" style="height: 93%; margin: 0px;">
+		<div id="home_adds" class="col adds">ADDS</div>
+		<div id="home_rooms" class="col rooms">ROOMS</div>
+		<div id="home_community" class="col community">
+			<div id="player_list" class="h-50 w-100 text-dark">
+				{#{ render(controller(
+			        'App\\Controller\\UserController::list',
+			        { 'online': false }
+			    )) }#}
+			</div>
+			<hr />
+			<div id="chat" class="h-50 w-100">
+				<div class="text-dark" id="chat_chat">
+					<ul>
+						<li class="text-danger">Chat disabled...</li>
+					</ul>
+				</div>
+				<div class="text-dark" id="chat_field">
+					<div class="form-group">
+						<textarea class="w-100 h-100 form-control" style="" rows="4" placeholder="Your text here..."></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% if room_form is defined %}
+		{{ include('room/form_create.html.twig') }}
+	{% endif %}
+	
+{% endblock %}

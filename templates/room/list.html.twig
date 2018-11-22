@@ -1,0 +1,11 @@
+{% for room in roomList %}
+	<div class="row room_list_row">
+		<div class="col">
+			<div class="row">
+				<strong>{{ room.name }}</strong>
+			</div>
+			
+		</div>
+	</div>
+{% endfor %}
+<input type="hidden" id="hid_info_nbroom" value="{{ nbRoom }}" />
