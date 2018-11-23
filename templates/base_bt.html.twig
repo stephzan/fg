@@ -10,9 +10,38 @@
 
         	<link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
 
-        {% endblock %}
+        {% endblock %}        
     </head>
     <body>
+    	<script type="text/javascript">
+		    window.fbAsyncInit = function() {
+		        FB.init({
+		            appId      : '2133519903567851',
+		            cookie     : true,
+		            xfbml      : true,
+		            version    : 'v3.2'
+		        });
+
+		        FB.AppEvents.logPageView();   
+
+		    };
+
+		    function statusChangeCallback(resp){
+		        console.log(resp);
+		    }
+
+		    (function(d, s, id){
+			    var js, fjs = d.getElementsByTagName(s)[0];
+			    if (d.getElementById(id)) {return;}
+			    js = d.createElement(s); js.id = id;
+			    js.src = "https://connect.facebook.net/en_US/sdk.js";
+			    fjs.parentNode.insertBefore(js, fjs);
+		    }(document, 'script', 'facebook-jssdk'));
+
+		    FB.getLoginStatus(function(response) {
+		        statusChangeCallback(response);
+		    });
+    	</script>
     	<div id="main-container" class="container-fluid bg-dark text-light">
 	    	{% block header %}
 				<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -34,7 +63,7 @@
 								</li>																
 							{% endblock %}
 						</ul>											
-						<ul class="navbar-nav" style="margin: 0px; margin-right: 100px;">
+						<ul class="navbar-nav" style="margin: 0px;">
 							{% block header_right %}
 								<li class="nav-item dropdown">
 								    <a class="nav-link dropdown-toggle" id="dropdown_user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><img width="25px" src="{{ asset('image/default-user.png') }}"></a>
@@ -44,7 +73,10 @@
 								        <hr />
 								        <a class="dropdown-item" href="/logout">{{ 'Log out'|trans }}</a>                                  
 								    </div>
-								</li>							
+								</li>
+								<li class="nav-item">
+									<a class="nav-link">{{ app.user.username }}</a>
+								</li>
 							{% endblock %}
 						</ul>						
 					</div>

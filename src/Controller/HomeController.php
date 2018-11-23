@@ -19,6 +19,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 class HomeController extends AbstractController
 {
     /**
+     * @param $request
+     * @param $roomRep
+     * @return render
      * @Route("/", name="home")
      */
     public function index(Request $request, RoomService $roomRep)

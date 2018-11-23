@@ -9,6 +9,8 @@ interface RoomRepositoryInterface
 
     public function save(Room $room);
 
+    public function find($id);
+
     public function findAll();
 
     public function createSeats(Room $room);

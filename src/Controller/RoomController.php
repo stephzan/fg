@@ -11,13 +11,19 @@ use Symfony\Component\Routing\Annotation\Route;
 class RoomController extends AbstractController
 {
     /**
-     * @Route("/room", name="room")
+     * @Route("/room/{id}", name="room")
      */
-    public function index()
+    public function index($id, RoomService $RoomService)
     {
-        return $this->render('room/index.html.twig', [
-            'controller_name' => 'RoomController',
-        ]);
+    	if(!$room = $RoomService->find($id)){
+
+    	}else{
+    		return $this->render('room/index.html.twig', [
+    		    'controller_name' => 'RoomController',
+    		    'room' => $room
+    		]);
+    	}
+        
     }
 
     /**

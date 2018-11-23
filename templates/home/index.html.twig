@@ -10,7 +10,7 @@
 
 	    <div class="dropdown-menu" aria-labelledby="dropdown_room">	    	
 	    	{% if user.room is not null %}
-	        	<a class="dropdown-item">{{ 'Open my room'|trans }}</a>
+	        	<a class="dropdown-item" href="/room/{{ user.room.id }}">{{ 'Open my room'|trans }}</a>
 	        {% else %}
 				<a data-toggle="modal" data-target="#mod_room_create" class="dropdown-item open_create_room">{{ 'New room'|trans }}</a>
 	        {% endif %}
