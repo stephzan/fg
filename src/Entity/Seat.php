@@ -18,7 +18,6 @@ class Seat
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Room", inversedBy="seats")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $room_id;
 

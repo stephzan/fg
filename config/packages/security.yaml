@@ -23,6 +23,10 @@ security:
             guard:
                 authenticators:
                     - App\Security\LoginAuthenticator
+                    - App\Security\MyFacebookAuthenticator
+                    - App\Security\DiscordAuthenticator
+                    - App\Security\GoogleAuthenticator
+                entry_point: App\Security\LoginAuthenticator
             form_login:
                 login_path: app_login
                 check_path: app_login

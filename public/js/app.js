@@ -15,6 +15,32 @@ function loadFreshContent(elmnt, controllerAction, dataType){
 	setTimeout('loadFreshContent("'+elmnt+'", "'+controllerAction+'", "'+dataType+'")', 20000);
 }
 
+function ajaxQuery(controller, action, data, callback){
+	var url = controller;
+	var data = {action: action, data: data};
+	var dataString = JSON.stringify(data);
+
+	var req = $.ajax({
+	    method: "post",
+	    url: url,
+	    data: {params: dataString},
+	    dataType: "json",
+	}).done( function(response) {
+	    callback(response);
+	}).fail(function(jxh,textmsg,errorThrown){
+	    console.log(errorThrown+": "+jxh.responseText);
+	});
+}
+
+var handleSeatAssign = function(result){
+	if(result.data !== ""){
+		//redirect
+		document.location.href = "room/"+result.data+"";
+	}else{
+		alert(result.error);
+	}
+}
+
 $(document).ready(function(){
 	if($("#player_list")){
 		loadFreshContent("player_list", "user/list/1" , "html");
@@ -33,4 +59,15 @@ $(document).ready(function(){
 			}
 		})
 	}
+
+	$("#home_rooms").on("click", ".get_seat", function(e){
+		e.preventDefault();
+
+		var idSeat = $(this).attr("data-seatid");
+		var position = $(this).attr("data-seatposition");
+		var idUser = $(this).attr("data-userid");
+
+		var data = [{'idSeat': idSeat, 'idUser': idUser}];
+		var req = ajaxQuery("seat/assign", "assign", data, handleSeatAssign)
+	})
 })

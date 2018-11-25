@@ -8,6 +8,7 @@ use App\Service\UserService;
 use App\Entity\Room;
 use App\Service\RoomService;
 
+
 use App\Form\RoomType;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,11 +21,11 @@ class HomeController extends AbstractController
 {
     /**
      * @param $request
-     * @param $roomRep
+     * @param $RoomService
      * @return render
      * @Route("/", name="home")
      */
-    public function index(Request $request, RoomService $roomRep)
+    public function index(Request $request, RoomService $RoomService)
     {
     	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -39,11 +40,11 @@ class HomeController extends AbstractController
             $roomForm->handleRequest($request);
 
             if($roomForm->isSubmitted()&& $roomForm->isValid()){
-                $room->setStatus(0)
+                $room->setStatus(1)
                     ->setUserId($user);
 
-                $roomRep->createSeats($room);
-                $roomRep->save($room);
+                $RoomService->createSeats($room);
+                $RoomService->save($room);
      
                 $user->setRoom($room);
 

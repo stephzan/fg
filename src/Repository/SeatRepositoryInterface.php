@@ -11,6 +11,8 @@ interface SeatRepositoryInterface
 
     public function findAll();
 
+    public function find($id);
+
     public function findBy(array $criteria, array $orderBy = NULL, $limit = NULL, $offset = NULL);
 
 }

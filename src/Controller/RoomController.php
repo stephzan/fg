@@ -18,6 +18,8 @@ class RoomController extends AbstractController
     	if(!$room = $RoomService->find($id)){
 
     	}else{
+            
+            
     		return $this->render('room/index.html.twig', [
     		    'controller_name' => 'RoomController',
     		    'room' => $room

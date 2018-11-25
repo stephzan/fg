@@ -51,7 +51,7 @@ class Room
     private $nbSeats;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Seat", mappedBy="room_id",cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Seat", mappedBy="room_id", cascade={"persist", "remove"})
      */
     private $seats;
 

@@ -25,6 +25,10 @@ final class SeatService
         return $this->repo->save($seat);
     }
 
+     public function find($id){
+        return $this->repo->find($id);
+     }
+
     public function findBy(array $criteria, array $orderBy = NULL, $limit = NULL, $offset = NULL){
         return $this->repo->findBy($criteria, $orderBy, $limit, $offset);
     }

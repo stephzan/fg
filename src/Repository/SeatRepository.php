@@ -12,11 +12,16 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method Seat[]    findAll()
  * @method Seat[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SeatRepository extends ServiceEntityRepository
+class SeatRepository extends ServiceEntityRepository implements SeatRepositoryInterface
 {
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Seat::class);
+    }
+
+    public function save(Seat $seat){
+        $this->_em->persist($seat);
+        $this->_em->flush();
     }
 
     // /**

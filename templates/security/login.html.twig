@@ -54,10 +54,16 @@
         </button>
     </form>
 
-    <h1 class="h3 mb-3 font-weight-normal">{{ 'Not already registered?'|trans }}</h1>
-    <a href="/register">
-        <button class="btn btn-lg btn-primary" type="">
-            {{ "Register now it's free!"|trans }}
-        </button>
+    <h1 class="h5 mb-3 font-weight-normal" style="margin-top: 0.9rem;">{{ 'Or sign in instantly with'|trans }}</h1>
+    <a class="btn btn-lg btn-primary fa fa-facebook" href="/connect/facebook">
+        {{ 'Facebook'|trans }}
     </a>
+    <a class="btn btn-lg btn-danger fa fa-google" href="/connect/google">
+        {{ 'Google'|trans }}
+    </a>
+    <a class="btn btn-lg btn-primary fa fa-discord" href="/connect/discord">
+        {{ 'Discord'|trans }}
+    </a>    
 {% endblock %}
+
+{% block javascripts %}{% endblock %}

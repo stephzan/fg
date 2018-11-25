@@ -73,14 +73,25 @@ class User implements UserInterface
     private $preference;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $facebookId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $discordId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $googleId;
+
+    /**
      * @ORM\OneToOne(targetEntity="App\Entity\Room", mappedBy="user_id", cascade={"persist", "remove"})
      */
     private $room;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Seat", mappedBy="user_id")
-     */
-    private $seats;
 
     public function __construct()
     {
@@ -251,6 +262,43 @@ class User implements UserInterface
 
         return $this;
     }
+   
+
+    public function getFacebookId(): ?int
+    {
+        return $this->facebookId;
+    }
+
+    public function setFacebookId(?int $facebookId): self
+    {
+        $this->facebookId = $facebookId;
+
+        return $this;
+    }
+
+    public function getDiscordId(): ?string
+    {
+        return $this->discordId;
+    }
+
+    public function setDiscordId(?string $discordId): self
+    {
+        $this->discordId = $discordId;
+
+        return $this;
+    }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): self
+    {
+        $this->googleId = $googleId;
+
+        return $this;
+    }
 
     public function getRoom(): ?Room
     {
@@ -263,38 +311,7 @@ class User implements UserInterface
 
         // set the owning side of the relation if necessary
         if ($this !== $room->getUserId()) {
-            $room->setUserId($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Seat[]
-     */
-    public function getSeats(): Collection
-    {
-        return $this->seats;
-    }
-
-    public function addSeat(Seat $seat): self
-    {
-        if (!$this->seats->contains($seat)) {
-            $this->seats[] = $seat;
-            $seat->setUserId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSeat(Seat $seat): self
-    {
-        if ($this->seats->contains($seat)) {
-            $this->seats->removeElement($seat);
-            // set the owning side to null (unless already changed)
-            if ($seat->getUserId() === $this) {
-                $seat->setUserId(null);
-            }
+            $room->setUser($this);
         }
 
         return $this;

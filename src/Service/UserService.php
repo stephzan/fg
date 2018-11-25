@@ -34,6 +34,10 @@ final class UserService
         return $this->repo->find($id);
     }
 
+    public function findOneBy(array $criteria, array $orderBy = null){
+        return $this->repo->findOneBy($criteria, $orderBy);
+    }
+
     public function findBy(array $criteria, array $orderBy = NULL, $limit = NULL, $offset = NULL){
         return $this->repo->findBy($criteria, $orderBy, $limit, $offset);
     }

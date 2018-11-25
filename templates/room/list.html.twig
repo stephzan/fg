@@ -2,9 +2,32 @@
 	<div class="row room_list_row">
 		<div class="col">
 			<div class="row">
-				<strong>{{ room.name }}</strong>
+				<div class="d-flex container-fluid">
+					<div class="p-2 mr-auto">
+						<strong>{{ room.name }}</strong>
+					</div>
+					<div class="p-2">
+						({{ room.userId.getUsername() }})
+					</div>					 
+				</div>
 			</div>
-			
+			<div class="row">
+				<div class="d-flex justify-content-between container-fluid">
+					{% for seat in room.getSeats() %}
+						<div class="p-2 room_seats">
+							{% if seat.getUserId() is not null %}
+								{{ seat.getUserId().getUsername() }}
+							{% else %}
+								{% if room.userId.getId() != app.user.getId() %}
+									<a class="get_seat" data-seatid="{{ seat.getId() }}" data-seatposition="{{ seat.getPosition() }}" data-userid="{{ app.user.getId() }}" href="#">{{ "Sit here"|trans }}</a>
+								{% else %}
+									{{ "Waiting for player" }}
+								{% endif %}
+							{% endif %}
+						</div>	
+					{% endfor %}					 
+				</div>
+			</div>			
 		</div>
 	</div>
 {% endfor %}

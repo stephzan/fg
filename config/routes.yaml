@@ -1,3 +1,3 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+connect_facebook_check:
+  path: /connect/facebook/check
+  controller: App\Controller\FacebookController::connectCheckAction

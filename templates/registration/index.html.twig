@@ -20,7 +20,17 @@
 
     <h1 class="h3 mb-3 font-weight-normal">{{ 'Welcome to FGAMES'|trans }}</h1>
     <h1 class="h5 mb-3 font-weight-normal">{{ 'Please fill the form below to join us'|trans }}</h1>
-
+    <h1 class="h5 mb-3 font-weight-normal">{{ 'Or register instantly with '|trans }}</h1>
+    <a class="btn btn-lg btn-primary fa fa-facebook" href="/connect/facebook">
+        {{ 'Facebook'|trans }}
+    </a>
+    <a class="btn btn-lg btn-primary fa fa-google" href="/connect/google">
+        {{ 'Google'|trans }}
+    </a>
+    <a class="btn btn-lg btn-primary fa fa-discord" href="/connect/discord">
+        {{ 'Discord'|trans }}
+    </a>
+<hr />
 	{{ form_start(form, {'attr':{'class':'center_form'}}) }}
 	    {{ form_widget(form) }}
 
