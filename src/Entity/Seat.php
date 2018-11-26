@@ -32,7 +32,7 @@ class Seat
     private $color;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="seats")
+     * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="seat")
      */
     private $user_id;
 

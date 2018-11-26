@@ -2,6 +2,25 @@
 
 {% block title %}Hello {{ controller_name }}!{% endblock %}
 
+{% block header %}{% endblock %}
+
 {% block body %}
-{{ dump(room) }}
+	<div class="row no-gutters h-100">
+		<div class="col col-3 h-100 bg-primary">
+			<h1 class="h4 text-center">{{ room.getName() }}</h1>
+			{% for seat in room.getSeats() %}
+				{{ dump(seat) }}
+			{% endfor %}
+		</div>
+		<div id="board" class="col col-9 h-100 bg-secondary">
+			
+		</div>	
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	<script type="text/javascript" src="{{ asset('js/p5/p5.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/p5/addons/p5.dom.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/sketches/tools.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/sketches/' ~ room.getGame().getCode() ~ '.js') }}"></script>
 {% endblock %}

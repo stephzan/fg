@@ -55,6 +55,13 @@ class Room
      */
     private $seats;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Game", inversedBy="rooms")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $game;
+
+
     public function __construct()
     {
         $this->seats = new ArrayCollection();
@@ -164,6 +171,18 @@ class Room
                 $seat->setRoomId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getGame(): ?Game
+    {
+        return $this->game;
+    }
+
+    public function setGame(?Game $game): self
+    {
+        $this->game = $game;
 
         return $this;
     }

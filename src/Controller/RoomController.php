@@ -33,8 +33,13 @@ class RoomController extends AbstractController
      */
     public function list($online, RoomService $RoomService)
     {
-    	$list = ($online === '1') ? $RoomService->findBy(["status"=>1]) : $RoomService->findAll();    	
+    	$list = ($online === '1') ? $RoomService->findBy(["status"=>1]) : $RoomService->findAll();	
     	$nbRoom = sizeof($list);
+
+        foreach ($list as $k => $room) {
+            $list[$k]->getGame()->setTextRules(json_encode($room->getGame()->getRule()->getRules()));
+        }
+
         return $this->render('room/list.html.twig', [
             'controller_name' => 'RoomController',
             'roomList' => $list,

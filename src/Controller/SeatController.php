@@ -42,7 +42,7 @@ class SeatController extends AbstractController
     				$seat->setUserId($this->getUser());
 
     				$SeatService->save($seat);
-    				$return["data"] = $data->idSeat;
+    				$return["data"] = $seat->getRoomId()->getId();
     			}
     		}
 

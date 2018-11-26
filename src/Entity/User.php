@@ -92,11 +92,10 @@ class User implements UserInterface
      */
     private $room;
 
-
-    public function __construct()
-    {
-        $this->seats = new ArrayCollection();
-    }
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Seat", mappedBy="user_id", cascade={"persist", "remove"})
+     */
+    private $seat;
 
     public function getId(): ?int
     {
@@ -313,6 +312,18 @@ class User implements UserInterface
         if ($this !== $room->getUserId()) {
             $room->setUser($this);
         }
+
+        return $this;
+    }
+
+    public function getSeat(): ?Seat
+    {
+        return $this->seat;
+    }
+
+    public function setSeat(string $seat): self
+    {
+        $this->seat = $seat;
 
         return $this;
     }

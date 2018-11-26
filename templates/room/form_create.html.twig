@@ -19,6 +19,13 @@
         </div>
 
         <div class="form-group">
+            {{ form_label(room_form.game) }}
+            {{ form_errors(room_form.game) }}
+            {{ form_widget(room_form.game) }}
+            {{ form_help(room_form.game) }}
+        </div>
+
+        <div class="form-group">
             {{ form_label(room_form.nbSeats) }}
             {{ form_errors(room_form.nbSeats) }}
             {{ form_widget(room_form.nbSeats) }}
