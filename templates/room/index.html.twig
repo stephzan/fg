@@ -9,7 +9,14 @@
 		<div class="col col-3 h-100 bg-primary">
 			<h1 class="h4 text-center">{{ room.getName() }}</h1>
 			{% for seat in room.getSeats() %}
-				{{ dump(seat) }}
+				<div class="row no-gutters w-100 bg-light text-dark" style="margin-bottom: 10px;">
+					<ul class="no-gutters">
+						<li class="font-weight-bold">{{ "Seat"|trans }}: {{ seat.getPosition() }}</li>
+						{% if seat.getUserId() is not null %}
+							<li class="font-weight-bold">{{ "Player"|trans }}: {{ seat.getUserId().getUsername() }}</li>
+						{% endif %}
+					</ul>
+				</div>
 			{% endfor %}
 		</div>
 		<div id="board" class="col col-9 h-100 bg-secondary">
