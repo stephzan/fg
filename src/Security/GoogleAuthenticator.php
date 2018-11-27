@@ -55,6 +55,9 @@ class GoogleAuthenticator extends SocialAuthenticator
         // 1) have they logged in with Google before? Easy!
         $existingUser = $this->userService->findOneBy(['googleId' => $googleUser->getId()]);
         if ($existingUser) {
+            $existingUser->setOnline(1);
+            $this->userService->save($existingUser);
+
             return $existingUser;
         }
 
@@ -64,12 +67,14 @@ class GoogleAuthenticator extends SocialAuthenticator
         if($existingUser){
             $user = $existingUser;
             $user->setGoogleId($googleUser->getId());
+            $user->setOnline(1);
             $this->userService->save($user);
         }else{
             $user = new User();
             $user->setEmail($email);
             $user->setUsername($username);
             $user->setGoogleId($googleUser->getId());
+            $user->setOnline(1);
             $this->userService->createNew($user);
         }
         

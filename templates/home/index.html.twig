@@ -58,7 +58,17 @@
 	            console.log("Received message", payload.msg);
 	        });
 
-		    session.publish("channel/user/home", "Chat started");
+		    $("#chat_send").keypress(function(e){
+		    	if(e.which == 13){
+		    		e.preventDefault();
+		    		var message = $("#chat_send").val();
+		    		console.log("Send message: ", message);
+
+		    		session.publish("channel/user/home", message);
+		    	}
+		    	
+
+		    });		    		    
 		});
 
 		webSocket.on("socket/disconnect", function (error) {
@@ -66,6 +76,10 @@
 
 		    console.log("Disconnected for " + error.reason + " with code " + error.code);
 		});
+
+
+
+		
 	</script>
 
 {% endblock %}

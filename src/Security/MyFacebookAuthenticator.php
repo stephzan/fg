@@ -55,6 +55,9 @@ class MyFacebookAuthenticator extends SocialAuthenticator
         // 1) have they logged in with Facebook before? Easy!
         $existingUser = $this->userService->findOneBy(['facebookId' => $facebookUser->getId()]);
         if ($existingUser) {
+            $existingUser->setOnline(1);
+            $this->userService->save($existingUser);
+
             return $existingUser;
         }
 
@@ -64,12 +67,14 @@ class MyFacebookAuthenticator extends SocialAuthenticator
         if($existingUser){
             $user = $existingUser;
             $user->setFacebookId($facebookUser->getId());
+            $user->setOnline(1);
             $this->userService->save($user);
         }else{
             $user = new User();
             $user->setEmail($email);
             $user->setUsername($username);
             $user->setFacebookId($facebookUser->getId());
+            $user->setOnline(1);
             $this->userService->createNew($user);
         }
         

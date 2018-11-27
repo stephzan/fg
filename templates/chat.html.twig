@@ -5,16 +5,6 @@
 </div>
 <div class="text-dark" id="chat_field">
 	<div class="form-group">
-		<form id="chat_form" method="POST" action="">
-			<textarea id="chat_send" class="w-100 h-100 form-control" style="" rows="4" placeholder="Your text here..."></textarea>
-		</form>
+		<textarea id="chat_send" class="w-100 h-100 form-control" style="" rows="4" placeholder="Your text here..."></textarea>
 	</div>
 </div>
-
-<script type="text/javascript">
-	$("#chat_form").on('submit', function(){
-		var message = $("#chat_send").val();
-		console.log("Send message: ", message);
-		
-	});
-</script>

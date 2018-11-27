@@ -7,6 +7,8 @@ parameters:
     locale: 'en'
 
 services:
+    app.logout.listener:
+        class: App\Listener\LogoutListener
     acme_hello.topic_sample_service:
         class: App\Socket\Topics\AcmeTopic
         tags:

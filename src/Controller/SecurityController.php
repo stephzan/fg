@@ -23,12 +23,13 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/logout")
+     * @Route("/logout", name="app_logout")
      *
      * @throws \RuntimeException
      */
     public function logoutAction()
     {
+        die(var_dump($this->getUser()));
         throw new \RuntimeException('This should never be called directly.');
     }
 }
