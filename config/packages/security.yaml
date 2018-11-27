@@ -31,9 +31,8 @@ security:
                 login_path: app_login
                 check_path: app_login
             logout: 
-                path: app_logout
+                path: /logout
                 target: /
-                handlers: [app.logout.listener]
 
             # activate different ways to authenticate
 
