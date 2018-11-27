@@ -7,6 +7,10 @@ parameters:
     locale: 'en'
 
 services:
+    acme_hello.topic_sample_service:
+        class: App\Socket\Topics\AcmeTopic
+        tags:
+            - { name: gos_web_socket.topic }
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

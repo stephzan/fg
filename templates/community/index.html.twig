@@ -3,18 +3,33 @@
 {% block title %}Hello {{ controller_name }}!{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+{% endblock %}
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
+	<script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'src/Controller/CommunityController.php'|file_link(0) }}">src/Controller/CommunityController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'templates/community/index.html.twig'|file_link(0) }}">templates/community/index.html.twig</a></code></li>
-    </ul>
-</div>
+	<script type="text/javascript">
+		var webSocket = WS.connect("ws://127.0.0.1:8080");
+
+		webSocket.on("socket/connect", function (session) {
+		    //session is an Autobahn JS WAMP session.
+
+		    console.log("Successfully Connected!");
+
+		    session.subscribe("channel/user/room1", function (uri, payload) {
+		            console.log("Received messagsse", payload.msg);
+		        });
+
+		    session.publish("channel/user/room1", "This is a message!");
+		});
+
+		webSocket.on("socket/disconnect", function (error) {
+		    //error provides us with some insight into the disconnection: error.reason and error.code
+
+		    console.log("Disconnected for " + error.reason + " with code " + error.code);
+		});
+	</script>
+
 {% endblock %}
