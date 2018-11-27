@@ -33,6 +33,7 @@ security:
             logout: 
                 path: /logout
                 target: /
+                handlers: [app.logout.listener]
 
             # activate different ways to authenticate
 
