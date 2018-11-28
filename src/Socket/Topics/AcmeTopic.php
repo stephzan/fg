@@ -19,7 +19,8 @@ class AcmeTopic implements TopicInterface
     public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
         //this will broadcast the message to ALL subscribers of this topic.
-        $topic->broadcast(['msg' => $connection->resourceId . " has joined " . $topic->getId()]);
+        //$topic->broadcast(['msg' => $connection->resourceId . " has joined " . $topic->getId()]);
+        $topic->broadcast(['msg' => "<span class='text-success'>Chat enabled...</span>"]);
     }
 
     /**

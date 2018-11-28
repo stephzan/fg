@@ -84,9 +84,6 @@ function setup(){
 
 	makeGrid(cols, rows, cellW);//Construct grid
 	addPawns(cols, rows, cellW);
-
-
-
 }
 
 function draw(){

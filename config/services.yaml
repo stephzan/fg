@@ -11,6 +11,7 @@ services:
         class: App\Listener\LogoutListener
     acme_hello.topic_sample_service:
         class: App\Socket\Topics\AcmeTopic
+        arguments: [ '@gos_web_socket.websocket.client_manipulator']
         tags:
             - { name: gos_web_socket.topic }
     # default configuration for services in *this* file
