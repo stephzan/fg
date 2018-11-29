@@ -19,13 +19,18 @@ var pawnColorDark;
 
 var activePawn;
 
+var target;//{Pawn that will be cathced,  Cell behind target}
+
 var dicLetters;
 
 var playerOne;
 var playerTwo;
 var players;
+var playersIndex = 0;
 var activePlayer;
 var me;
+
+var playBothSide = true;//Set to false for test and prod
 
 function Cell(i, j, w, color, coord){
 	this.i = i;
@@ -33,7 +38,7 @@ function Cell(i, j, w, color, coord){
 	this.x = i * w;
 	this.y = j * w;
 	this.w = w;
-	this.c = color;
+	this.color = color;
 	this.coord = coord;
 
 	this.active = false;
@@ -43,7 +48,7 @@ function Cell(i, j, w, color, coord){
 
 }
 Cell.prototype.show = function(){
-	fill(this.c);
+	fill(this.color);
 	if(this.active === true){
 		fill(204, 255, 204);
 	}
@@ -63,18 +68,19 @@ Cell.prototype.setPawn = function(pawn){
 	this.pawn = pawn;
 }
 
-function Pawn(i, j, w, color){
+function Pawn(i, j, w, color, side){
 	this.i = i;
 	this.j = j;
 	this.x = i * w;
 	this.y = j * w;
 	this.w = w;
-	this.c = color;
+	this.color = color;
+	this.side = side;
 
 	this.active = false;
 }
 Pawn.prototype.show = function(){
-	fill(this.c);
+	fill(this.color);
 	if(this.active === true){
 		fill(123);
 	}
@@ -112,13 +118,39 @@ Pawn.prototype.calculateOptions = function(i, j){
 				
 		if(cell.pawn === undefined){
 			//if empty cell. No back allowed.
-			if(cell.j < j){
+			if(playBothSide === false){
+				if(cell.j < j){
+					available = true;
+				}
+			}else{
 				available = true;
 			}
 			
 		}else{
-			console.log(cell.coord+": ");
-			console.log(cell.pawn);
+			if(cell.pawn.side != activePlayer.side){
+				//check if catchable
+				//Define direction to find the catch target
+				var targetI = (this.i < cell.pawn.i) ? this.i+1 : this.i-1;
+				var targetJ = (this.j < cell.pawn.j) ? this.j+1 : this.j-1;
+
+				var nextI = (this.i < cell.pawn.i) ? this.i+2 : this.i-2;
+				var nextJ = (this.j < cell.pawn.j) ? this.j+2 : this.j-2;
+				
+
+				if(grid[nextI] !== undefined&& grid[nextI][nextJ] !== undefined&& grid[nextI][nextJ].pawn === undefined){
+					grid[nextI][nextJ].active = true;
+					activeCells.push(grid[nextI][nextJ]);
+
+					target = {pawn: {i: targetI, j: targetJ}, cell: grid[nextI][nextJ].coord};
+
+					console.log("Try catch: "+grid[nextI][nextJ].coord);
+				}
+			}
+
+			/*console.log(cell.coord+": ");
+			console.log(cell.pawn.side);
+			console.log(activePlayer.side);
+			console.log(cell.pawn.side === activePlayer.side);*/
 		}
 
 		if(available === true){
@@ -128,6 +160,7 @@ Pawn.prototype.calculateOptions = function(i, j){
 	}
 }
 Pawn.prototype.moveToTarget = function(cell){
+
 
 	//Store actual data
 	var prevI = this.i;
@@ -148,7 +181,20 @@ Pawn.prototype.moveToTarget = function(cell){
 	pawns[prevI][prevJ] = undefined;
 	grid[prevI][prevJ].pawn = undefined;
 
+	//Check if pawn was target
+	if(target !== undefined){
+		if(target.cell === cell.coord){
+			//Remove target pawn
+			pawns[target.pawn.i][target.pawn.j] = undefined;
+			grid[target.pawn.i][target.pawn.j].pawn = undefined;
+		}
+
+		target = undefined;//Reset target
+	}
+
 	resetActive();
+
+	nextPlayer();
 
 }
 
@@ -179,8 +225,9 @@ function addPawns(cols, rows, cellW){
 	for(i = 0; i < cols; i++){		
 		for(j = 0;  j< rows; j++){
 			color = (j < 4) ? pawnColorDark : pawnColorLight;
+			side = (j < 4) ? "dark" : "light";
 			if( ((j < 3)|| (j > 4))&& ((i + j) % 2 != 0) )
-				pawns[i][j] = new Pawn(i, j, cellW, color);
+				pawns[i][j] = new Pawn(i, j, cellW, color, side);
 				grid[i][j].setPawn(pawns[i][j]);//Assign pawn to cell
 		}	
 	}
@@ -206,6 +253,28 @@ function setup(){
 
 	makeGrid(cols, rows, cellW);//Construct grid
 	addPawns(cols, rows, cellW);
+
+	playerOne = {name: "Stéphane Carolooo", side: "light"};
+	playerTwo = {name: "Superadmin Steph", side: "dark"};
+	players = [playerOne, playerTwo];
+
+	activePlayer = players[playersIndex];
+
+	//console.log(activePlayer);
+}
+
+function nextPlayer(){
+	var nextIndex = playersIndex+1;//Increment index
+
+	if(players[nextIndex] !== undefined){
+		playersIndex++;	
+	}else{
+		playersIndex = 0;
+	}
+
+	activePlayer = players[playersIndex];
+
+	//console.log(activePlayer);
 }
 
 function resetActive(){
@@ -227,7 +296,7 @@ function mousePressed(){
 	/* if click on pawn */	
 	for(i = 0; i < cols; i++){
 		for(j = 0;  j< rows; j++){			
-			if(pawns[i][j] !== undefined){
+			if(pawns[i][j] !== undefined&& pawns[i][j].side === activePlayer.side){
 				if(pawns[i][j].contains(mouseX, mouseY)){					
 					pawns[i][j].calculateOptions(i, j);
 				}
