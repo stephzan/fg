@@ -1,0 +1,312 @@
+var cnv;
+var grid;
+var pawns;
+var parentW = document.getElementById("board").offsetHeight;
+var cnvW = Math.floor(parentW * 0.85);
+var cnvH = cnvW;
+
+var cellW = cnvW/8;
+var cellColorLight;
+var cellColorDark;
+
+var activeCells=[];
+
+var cols = Math.floor(cnvW / cellW);
+var rows = Math.floor(cnvH / cellW);
+
+var pawnColorLight;
+var pawnColorDark;
+
+var activePawn;
+
+var dicLetters;
+
+var players=[];
+var playerOne;
+var playerTwo;
+var activePlayer;
+var me;
+
+/* ==== CELLS ==== */
+function Cell(i, j, w, color, coord){
+	this.i = i;
+	this.j = j;
+	this.x = i * w;
+	this.y = j * w;
+	this.w = w;
+	this.c = color;
+	this.coord = coord;
+
+	this.active = false;//Bool
+
+	this.pawn = false;//False or pawn object
+
+
+}
+Cell.prototype.show = function(){
+	fill(this.c);
+	if(this.active === true){
+		fill(204, 255, 204);
+	}
+	rect(this.x, this.y, this.w, this.w);
+
+	/* DEBUG */
+	fill(255);
+	text(this.coord, this.x, this.y+10);
+}
+Cell.prototype.contains = function(x, y){
+	return (x > this.x&& x < this.x+this.w&& y > this.y&& y < this.y+this.w);
+}
+Cell.prototype.toggle = function(){
+	this.active = !this.active;
+}
+Cell.prototype.setPawn = function(pawn){
+	this.pawn = pawn;
+}
+
+/* ==== PAWNS ==== */
+function Pawn(i, j, w, color, pawnColor){
+	this.i = i;
+	this.j = j;
+	this.x = i * w;
+	this.y = j * w;
+	this.w = w;
+	this.c = color;
+	this.pawnColor = pawnColor;
+
+	this.active = false;
+}
+Pawn.prototype.show = function(){
+	fill(this.c);
+	if(this.active === true){
+		fill(123);
+	}
+	ellipse(this.x + this.w * 0.5, this.y + this.w * 0.5, this.w, this.w);
+}
+Pawn.prototype.contains = function(x, y){
+	return (x > this.x&& x < this.x+this.w&& y > this.y&& y < this.y+this.w);
+}
+Pawn.prototype.toggle = function(){
+	this.active = !this.active;
+}
+Pawn.prototype.calculateOptions = function(){
+	var options = [];
+	if((grid[this.i+1] !== undefined)&& (grid[this.i+1][this.j+1]!= undefined)){
+		options.push(grid[this.i+1][this.j+1]);
+	}
+	if((grid[this.i-1] !== undefined)&& (grid[this.i-1][this.j-1]!= undefined)){
+		options.push(grid[this.i-1][this.j-1]);
+	}
+	if((grid[this.i+1] !== undefined)&& (grid[this.i+1][this.j-1]!= undefined)){
+		options.push(grid[this.i+1][this.j-1]);
+	}
+	if((grid[this.i-1] !== undefined)&& (grid[this.i-1][this.j+1]!= undefined)){
+		options.push(grid[this.i-1][this.j+1]);
+	}
+	
+	resetActive();
+	this.active = true;
+	activePawn = this;
+
+	console.log(activePlayer);
+
+	for(var i = 0; i < options.length; i++){
+		var available = false;//cell fullfield status
+
+		var cell = options[i];
+				
+		if(cell.pawn === undefined|| cell.pawn === false){
+			//if empty cell
+			available = true;
+		}else if(cell.pawn !== undefined&& cell.pawn !== false){
+			if(cell.pawn.pawnColor === this.pawnColor){
+				available = false;
+			}else{
+
+				//Define direction to find the cath target
+				var nextI = (this.i < cell.pawn.i) ? this.i+2 : this.i-2;
+				var nextJ = (this.j < cell.pawn.j) ? this.j+2 : this.j-2;
+
+				console.log(activeCells);
+
+				//Check if catchable
+				console.log("Source: "+grid[this.i][this.j].coord);
+				console.log("Source: "+this.i);
+				console.log("Source: "+this.j);
+
+				console.log("Target: "+cell.coord);
+				console.log("Target: "+cell.pawn.i);
+				console.log("Target: "+cell.pawn.j);
+
+				if(grid[nextI] !== undefined&& grid[nextI][nextJ] !== undefined){
+					grid[nextI][nextJ].active = true;
+					activeCells = [];
+					activeCells.push(grid[nextI][nextJ]);
+					console.log("Try cath: "+grid[nextI][nextJ].coord);	
+				}								
+			}
+		}
+
+		if(available === true){
+			cell.active = true;
+			activeCells.push(cell);
+		}		
+	}
+}
+Pawn.prototype.moveToTarget = function(cell){
+	grid[this.i][this.j].pawn = undefined;
+
+	this.x = cell.x;
+	this.y = cell.y;
+	this.i = cell.i;
+	this.j = cell.j;
+
+	pawns[cell.i][cell.j] = this;
+	cell.setPawn(this);
+
+	resetActive();
+
+}
+
+/* ==== PLAYERS ==== */
+function Player(playerName, pawnColor){
+	this.playerName = playerName;
+	this.pawnColor = pawnColor;
+}
+
+function centerCanvas() {
+  var x = (parentW - cnvW) / 2;
+  var y = (parentW - cnvH) / 2;
+  cnv.position(x, y);
+}
+
+function makeGrid(cols, rows, cellW){
+	var color;
+	var letter;
+	var coord;
+
+	for(i = 0; i < cols; i++){	
+		letter = dicLetters.get(i+1);	
+		for(j = 0;  j< rows; j++){
+			color = ((i + j) % 2 == 0) ? cellColorLight : cellColorDark;
+			coord = letter+(j+1);
+
+			grid[i][j] = new Cell(i, j, cellW, color, coord);
+		}	
+	}
+}
+
+function addPawns(cols, rows, cellW){
+	var color;
+	for(i = 0; i < cols; i++){		
+		for(j = 0;  j< rows; j++){
+			color = (j < 4) ? pawnColorLight : pawnColorDark;
+			pawnColor = (color === pawnColorLight) ? "light" : "dark";
+			if( ((j < 3)|| (j > 4))&& ((i + j) % 2 != 0) )
+				pawns[i][j] = new Pawn(i, j, cellW, color, pawnColor);
+				grid[i][j].setPawn(pawns[i][j]);//Assign pawn to cell
+		}	
+	}
+}
+
+function setup(){	
+	cnv = createCanvas(cnvW+1, cnvH+1);
+	cnv.parent("board");
+	centerCanvas();
+
+	background(255);
+
+	cellColorLight = color(182, 155, 76);
+	cellColorDark = color(130, 82, 1);
+
+	pawnColorLight = color(255, 255, 255);
+	pawnColorDark = color(0, 0, 0);
+
+	grid = make2DArray(cols, rows);//Set array as cols and rows
+	pawns = make2DArray(cols, rows);//Set array as cols and rows
+
+	dicLetters = createStringDict({1:"A", 2:"B", 3:"C", 4:"D", 5:"E", 6:"F", 7:"G", 8:"H"});
+
+	playerOne = new Player("Stéphane", "light");
+	playerTwo = new Player("Jojo", "dark");
+	players = [playerOne, playerTwo];
+	activePlayer = playerOne;
+
+	makeGrid(cols, rows, cellW);//Construct grid
+	addPawns(cols, rows, cellW);
+}
+
+function resetActive(){
+	for(i = 0; i < cols; i++){
+		for(j = 0;  j< rows; j++){
+			grid[i][j].active = false;//Reset all active cells	
+
+			if(pawns[i][j] !== undefined){
+				pawns[i][j].active = false;
+			}
+		}
+	}
+
+	activeCells = [];//empty activecells
+	activePawn = "";
+}
+
+function mousePressed(){
+	/* if click on pawn */	
+	for(i = 0; i < cols; i++){
+		for(j = 0;  j< rows; j++){
+			
+			/*DEBUG
+			if(grid[i][j].contains(mouseX, mouseY)){
+				console.log("Click: ");
+				console.log(grid[i][j]);
+			} */
+
+			if(pawns[i][j] !== undefined){
+				if(pawns[i][j].contains(mouseX, mouseY)){					
+					pawns[i][j].calculateOptions();
+				}
+			}
+		}	
+	}/* END */
+
+	for(var i = 0; i < activeCells.length; i++){
+		var cell = activeCells[i];
+
+		if(cell.contains(mouseX, mouseY)){
+			console.log("Target: " + cell.coord);
+			var pawn = activePawn;
+			pawn.moveToTarget(cell);		
+		}
+	}
+}
+
+function draw(){
+	for(i = 0; i < cols; i++){
+		for(j = 0;  j< rows; j++){
+			grid[i][j].show();//Draw cells
+
+			if(pawns[i][j] !== undefined){
+				pawns[i][j].show();//Draw pawns
+			}
+		}	
+	}
+}
+
+function windowResized() {
+	parentW = document.getElementById("board").offsetHeight;
+	cnvW = Math.floor(parentW * 0.85);
+	cnvH = cnvW;
+
+	cellW = cnvW/8;
+
+	cols = Math.floor(cnvW / cellW);
+	rows = Math.floor(cnvH / cellW);
+
+	makeGrid(cols, rows, cellW);//Construct grid
+	addPawns(cols, rows, cellW);
+
+	resizeCanvas(cnvW, cnvH);//Set to new size
+	redraw();//Set all elements to new ratio
+	centerCanvas();//Center canvas
+}
