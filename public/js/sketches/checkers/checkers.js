@@ -92,7 +92,7 @@ Pawn.prototype.contains = function(x, y){
 Pawn.prototype.toggle = function(){
 	this.active = !this.active;
 }
-Pawn.prototype.calculateOptions = function(i, j){
+Pawn.prototype.calculateOptions = function(){
 	var options = [];
 	if((grid[this.i+1] !== undefined)&& (grid[this.i+1][this.j+1]!= undefined)){
 		options.push(grid[this.i+1][this.j+1]);
@@ -119,7 +119,7 @@ Pawn.prototype.calculateOptions = function(i, j){
 		if(cell.pawn === undefined){
 			//if empty cell. No back allowed.
 			if(playBothSide === false){
-				if(cell.j < j){
+				if(cell.j < this.j){
 					available = true;
 				}
 			}else{
@@ -193,7 +193,6 @@ Pawn.prototype.moveToTarget = function(cell){
 	}
 
 	resetActive();
-
 	nextPlayer();
 
 }
@@ -255,12 +254,13 @@ function setup(){
 	addPawns(cols, rows, cellW);
 
 	playerOne = {name: "Stéphane Carolooo", side: "light"};
+	me = playerOne;
 	playerTwo = {name: "Superadmin Steph", side: "dark"};
 	players = [playerOne, playerTwo];
 
 	activePlayer = players[playersIndex];
 
-	//console.log(activePlayer);
+	console.log(activePlayer);
 }
 
 function nextPlayer(){
@@ -274,7 +274,7 @@ function nextPlayer(){
 
 	activePlayer = players[playersIndex];
 
-	//console.log(activePlayer);
+	console.log(activePlayer);
 }
 
 function resetActive(){
@@ -297,9 +297,17 @@ function mousePressed(){
 	for(i = 0; i < cols; i++){
 		for(j = 0;  j< rows; j++){			
 			if(pawns[i][j] !== undefined&& pawns[i][j].side === activePlayer.side){
-				if(pawns[i][j].contains(mouseX, mouseY)){					
-					pawns[i][j].calculateOptions(i, j);
-				}
+				if(playBothSide === false){
+					if(activePlayer === me){
+						if(pawns[i][j].contains(mouseX, mouseY)){					
+							pawns[i][j].calculateOptions();
+						}
+					}
+				}else{
+					if(pawns[i][j].contains(mouseX, mouseY)){					
+						pawns[i][j].calculateOptions();
+					}
+				}				
 			}
 		}	
 	}/* END */
