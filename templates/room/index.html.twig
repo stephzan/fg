@@ -5,25 +5,25 @@
 {% block header %}{% endblock %}
 
 {% block body %}
+	
 	<div class="row no-gutters h-100">
-		<div class="col col-3 h-100 bg-primary">
-			<h1 class="h4 text-center">{{ room.getName() }}</h1>
-			{% for seat in room.getSeats() %}
-				<div class="row no-gutters w-100 bg-light text-dark" style="margin-bottom: 10px;">
-					<ul class="no-gutters">
-						<li class="font-weight-bold">{{ "Seat"|trans }}: {{ seat.getPosition() }}</li>
-						{% if seat.getUserId() is not null %}
-							<li class="font-weight-bold">{{ "Player"|trans }}: {{ seat.getUserId().getUsername() }}</li>
-						{% else %}
-							<li class="font-weight-bold">{{ "Waiting for player"|trans }}</li>
-						{% endif %}
-					</ul>
-				</div>
-			{% endfor %}
+		<div id="cont_alert" class="alert alert-primary w-75" style="position: absolute; right: 0px; margin: 0px; z-index:999; text-align: right; display: block;"><ul></ul></div>
+
+		<input type="hidden" id="hid_seat_tpl" value="{{ asset('room/seats.html.twig') }}" />
+		<input type="hidden" id="hid_room_id" value="{{ room.getId() }}" />
+		<input type="hidden" id="hid_nb_seats" value="{{ room.getNbSeats() }}" />
+
+		<div id="cont_seats" class="col col-3 h-100 bg-primary">
+			<ul id="cont_seats_list" class="no-gutters w-100">
+				{% for seat in room.getSeats() %}
+					<li class="font-weight-bold bg-light text-dark">{{ "Seat"|trans }}: <span id="cont_seat_position_{{ seat.getPosition() }}" class="cont_seat_position">{{ seat.getPosition() }}</span></li>
+					<li class="seat_user font-weight-bold bg-light text-dark">
+						{{ "Player"|trans }}: <span id="cont_seat_playername_{{ seat.getPosition() }}" class="cont_seat_playername">{{ "Waiting for player"|trans }}</span>
+						<input type="hidden" id="hid_player_data_{{ seat.getPosition() }}" class="hid_player_data" data-playerid="" data-playername="">					
+				{% endfor %}
+			</ul>
 		</div>
-		<div id="board" class="col col-9 h-100 bg-secondary">
-			
-		</div>	
+		<div id="board" class="col col-9 h-100 bg-secondary"></div>	
 	</div>
 {% endblock %}
 
@@ -32,5 +32,63 @@
 	<script type="text/javascript" src="{{ asset('js/p5/p5.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('js/p5/addons/p5.dom.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('js/sketches/tools.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('js/sketches/' ~ room.getGame().getCode() ~ '/' ~ room.getGame().getCode() ~ '.js') }}"></script>
+
+	<script src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
+	<script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
+
+	<script type="text/javascript" src="{{ asset('js/sketches/' ~ room.getGame().getCode() ~ '/' ~ room.getGame().getCode() ~ '.js?29') }}"></script>
+
+	<!-- <script type="text/javascript">
+
+		function loadPlayerData(data){
+			var obj = JSON.parse(data);
+
+			console.log(obj);			
+			$("#cont_seats_list").empty();
+			$.each(obj, function(){
+				var content = '<li style="list-style-type: none;" class="font-weight-bold">Seat: '+this.position+'</li><li style="list-style-type: none;" class="seat_user font-weight-bold">Player: '+this.name+'<input type="hidden" class="hid_player_data" data-playerid="'+this.id+'" data-playername="'+this.name+'"></li>';
+
+				$("#cont_seats_list").append(content);
+
+			});
+		}
+
+		$(document).ready(function(){
+			var webSocket = WS.connect("ws://127.0.0.1:8080");
+
+			webSocket.on("socket/connect", function (session) {
+			    //session is an Autobahn JS WAMP session.
+
+			    console.log("Successfully Connected!");
+
+			    session.subscribe("channel/room/{{ room.getId() }}", function (uri, payload) {
+			    	console.log("Received message from ", uri);
+		            console.log("Received message", payload.msg);
+
+		            //loadPlayerData(payload.msg);
+		        });
+
+			    /*var loadPlayersMsg = {type: "api_instruction", msg: "loadUserList"};
+		        session.publish("channel/room/{{ room.getId() }}", loadPlayersMsg);*/
+
+			    /*$("#chat_send").keypress(function(e){
+			    	if(e.which == 13){
+			    		e.preventDefault();
+			    		var message = $("#chat_send").val();
+			    		console.log("Send message: ", message);
+
+			    		session.publish("channel/room/{{ room.getId() }}", message);
+			    	}
+			    	
+
+			    });*/
+			});
+
+			webSocket.on("socket/disconnect", function (error) {
+			    //error provides us with some insight into the disconnection: error.reason and error.code
+
+			    console.log("Disconnected for " + error.reason + " with code " + error.code);
+			});
+		});
+	</script>-->
 {% endblock %}

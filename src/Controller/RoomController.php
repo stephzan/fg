@@ -18,7 +18,7 @@ class RoomController extends AbstractController
     	if(!$room = $RoomService->find($id)){
 
     	}else{
-            
+            $room->setNbSeats(sizeof($room->getSeats()));
             
     		return $this->render('room/index.html.twig', [
     		    'controller_name' => 'RoomController',

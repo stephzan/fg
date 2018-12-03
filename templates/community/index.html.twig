@@ -4,13 +4,20 @@
 
 {% block body %}
 
+	<div id="alert" class="alert alert-primary">
+		<ul></ul>		
+	</div>
+
 {% endblock %}
 {% block javascripts %}
-	{{ parent() }}
+	<script src="{{ asset('https://code.jquery.com/jquery-3.2.1.min.js') }}"></script>
+
 	<script src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
 	<script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
 
 	<script type="text/javascript">
+		var msgList = $("#alert ul");
+
 		var webSocket = WS.connect("ws://127.0.0.1:8080");
 
 		webSocket.on("socket/connect", function (session) {
@@ -18,11 +25,12 @@
 
 		    console.log("Successfully Connected!");
 
-		    session.subscribe("channel/user/room1", function (uri, payload) {
-		            console.log("Received messagsse", payload.msg);
+		    session.subscribe("channel/room/1", function (uri, payload) {
+		            console.log("Received message", payload);
+		            msgList.append("<li>"+payload.msg+"</li>");
 		        });
 
-		    session.publish("channel/user/room1", "This is a message!");
+		    session.publish("channel/room/1", "This is a message!");
 		});
 
 		webSocket.on("socket/disconnect", function (error) {

@@ -14,5 +14,6 @@ interface SeatRepositoryInterface
     public function find($id);
 
     public function findBy(array $criteria, array $orderBy = NULL, $limit = NULL, $offset = NULL);
+    public function refresh(Seat $seat);
 
 }

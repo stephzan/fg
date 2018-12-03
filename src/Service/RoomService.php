@@ -41,4 +41,8 @@ final class RoomService
     public function findAll(){
         return $this->repo->findAll();
     }
+
+    public function refresh(Room $room){
+        return $this->repo->refresh($room);
+    }
 }

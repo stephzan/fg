@@ -14,6 +14,11 @@ services:
         arguments: [ '@gos_web_socket.websocket.client_manipulator']
         tags:
             - { name: gos_web_socket.topic }
+    room.topic_sample_service:
+        class: App\Socket\Topics\RoomTopic
+        arguments: [ '@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager']
+        tags:
+            - { name: gos_web_socket.topic }
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

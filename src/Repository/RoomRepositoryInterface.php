@@ -17,5 +17,7 @@ interface RoomRepositoryInterface
 
     public function findBy(array $criteria, array $orderBy = NULL, $limit = NULL, $offset = NULL);
 
+    public function refresh(Room $room);
+
 }
 

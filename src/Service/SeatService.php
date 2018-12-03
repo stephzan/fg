@@ -36,4 +36,8 @@ final class SeatService
     public function findAll(){
         return $this->repo->findAll();
     }
+
+    public function refresh(Seat $seat){
+        return $this->repo->refresh($seat);
+    }
 }

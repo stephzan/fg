@@ -40,4 +40,8 @@ class RoomRepository extends ServiceEntityRepository implements RoomRepositoryIn
         $this->_em->persist($room);
         $this->_em->flush();
     }
+
+    public function refresh(Room $room){
+        return $this->_em->refresh($room);
+    }
 }

@@ -12,6 +12,7 @@ class CommunityController extends AbstractController
      */
     public function index()
     {
+    	//var_dump($this->getDoctrine());
         return $this->render('community/index.html.twig', [
             'controller_name' => 'CommunityController',
         ]);

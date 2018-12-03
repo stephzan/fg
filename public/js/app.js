@@ -68,6 +68,6 @@ $(document).ready(function(){
 		var idUser = $(this).attr("data-userid");
 
 		var data = [{'idSeat': idSeat, 'idUser': idUser}];
-		var req = ajaxQuery("seat/assign", "assign", data, handleSeatAssign)
+		var req = ajaxQuery("seat/assign", "assign", data, handleSeatAssign);
 	})
 })

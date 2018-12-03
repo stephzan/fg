@@ -8,6 +8,7 @@
 	<div class="row no-gutters h-100">
 		<div class="col col-3 h-100 bg-primary">
 			<h1 class="h4 text-center">{{ room.getName() }}</h1>
+			{{ dump(room.getSeats()|length) }}
 			{% for seat in room.getSeats() %}
 				<div class="row no-gutters w-100 bg-light text-dark" style="margin-bottom: 10px;">
 					<ul class="no-gutters">

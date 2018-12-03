@@ -24,6 +24,10 @@ class SeatRepository extends ServiceEntityRepository implements SeatRepositoryIn
         $this->_em->flush();
     }
 
+    public function refresh(Seat $seat){
+        $this->_em->refresh($seat);
+    }
+
     // /**
     //  * @return Seat[] Returns an array of Seat objects
     //  */

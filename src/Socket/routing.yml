@@ -2,3 +2,7 @@ acme_topic:
     channel: channel/user/{room}
     handler:
         callback: 'acme.topic' #related to the getName() of your topic
+room_topic:
+    channel: channel/room/{room}
+    handler:
+        callback: 'room.topic' #related to the getName() of your topic
