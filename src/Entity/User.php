@@ -321,7 +321,7 @@ class User implements UserInterface
         return $this->seat;
     }
 
-    public function setSeat(string $seat): self
+    public function setSeat(string $seat=null): self
     {
         $this->seat = $seat;
 

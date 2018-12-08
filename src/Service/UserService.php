@@ -50,4 +50,8 @@ final class UserService
     public function findAll(){
         return $this->repo->findAll();
     }
+
+    public function removeElement($element){
+        return $this->repo->removeElement($element);
+    }
 }

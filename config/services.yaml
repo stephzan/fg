@@ -6,7 +6,10 @@
 parameters:
     locale: 'en'
 
-services:
+services:    
+    security.service:
+        class: App\Service\SecurityService
+
     app.logout.listener:
         class: App\Listener\LogoutListener
     acme_hello.topic_sample_service:
@@ -16,7 +19,12 @@ services:
             - { name: gos_web_socket.topic }
     room.topic_sample_service:
         class: App\Socket\Topics\RoomTopic
-        arguments: [ '@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager']
+        arguments: [ '@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager', '@session']
+        tags:
+            - { name: gos_web_socket.topic }
+    community.topic_sample_service:
+        class: App\Socket\Topics\CommunityTopic
+        arguments: [ '@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager', '@session']
         tags:
             - { name: gos_web_socket.topic }
     # default configuration for services in *this* file

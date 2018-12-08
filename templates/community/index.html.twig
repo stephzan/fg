@@ -4,40 +4,24 @@
 
 {% block body %}
 
-	<div id="alert" class="alert alert-primary">
-		<ul></ul>		
+	<div id="cont_alert" class="alert alert-primary">
+		<ul>
+			<li>{{ app.user.getId() }}</li>
+		</ul>		
 	</div>
+	<div id="board" class="col col-9 h-100 bg-secondary"></div>	
+	<input type="hidden" id="hid_player_id" value="{{ app.user.getId() }}" />
 
 {% endblock %}
 {% block javascripts %}
 	<script src="{{ asset('https://code.jquery.com/jquery-3.2.1.min.js') }}"></script>
 
 	<script src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
-	<script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
+	<script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js?45') }}"></script>
 
-	<script type="text/javascript">
-		var msgList = $("#alert ul");
+	<script type="text/javascript" src="{{ asset('js/p5/p5.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/p5/addons/p5.dom.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/sketches/tools.js') }}"></script>
 
-		var webSocket = WS.connect("ws://127.0.0.1:8080");
-
-		webSocket.on("socket/connect", function (session) {
-		    //session is an Autobahn JS WAMP session.
-
-		    console.log("Successfully Connected!");
-
-		    session.subscribe("channel/room/1", function (uri, payload) {
-		            console.log("Received message", payload);
-		            msgList.append("<li>"+payload.msg+"</li>");
-		        });
-
-		    session.publish("channel/room/1", "This is a message!");
-		});
-
-		webSocket.on("socket/disconnect", function (error) {
-		    //error provides us with some insight into the disconnection: error.reason and error.code
-
-		    console.log("Disconnected for " + error.reason + " with code " + error.code);
-		});
-	</script>
-
+	<script src="{{ asset('js/sketches/checkers/checkers_test2.js') }}"></script>
 {% endblock %}

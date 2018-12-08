@@ -6,3 +6,7 @@ room_topic:
     channel: channel/room/{room}
     handler:
         callback: 'room.topic' #related to the getName() of your topic
+community_topic:
+    channel: channel/community/{community}
+    handler:
+        callback: 'community.topic' #related to the getName() of your topic

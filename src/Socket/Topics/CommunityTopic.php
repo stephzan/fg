@@ -3,31 +3,30 @@ namespace App\Socket\Topics;
 
 use App\Entity\User;
 
-use App\Entity\Room;
-use App\Entity\Seat;
-use App\Service\RoomService;
-
 use Gos\Bundle\WebSocketBundle\Topic\TopicInterface;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Gos\Bundle\WebSocketBundle\Topic\SecuredTopicInterface;
 use Gos\Bundle\WebSocketBundle\Server\Exception\FirewallRejectionException;
+use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 
 use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\HttpFoundation\Session\Session;
-use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 
 
 
-class RoomTopic implements TopicInterface, SecuredTopicInterface
+class CommunityTopic implements TopicInterface, SecuredTopicInterface
 {
-    protected $RoomService, $room, $player, $resources=[];
+    protected $em, $client, $topicId, $resourceId, $resources=[];
+
     public function __construct(ClientManipulatorInterface $client, EntityManager $em, Session $session){
         $this->em = $em;
         $this->client = $client;
         $this->session = $session;
     }
+
     /**
      * @param ConnectionInterface $conn
      * @param Topic               $topic
@@ -88,7 +87,7 @@ class RoomTopic implements TopicInterface, SecuredTopicInterface
     public function onUnSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
         //this will broadcast the message to ALL subscribers of this topic.        
-        $topic->broadcast(['msg' => $connection->resourceId . " has left " . $topic->getId()]);
+        $topic->broadcast(['msg' => "New player"]);
     }
 
     /**
@@ -110,8 +109,7 @@ class RoomTopic implements TopicInterface, SecuredTopicInterface
                     $player = ["player" => [
                             "id" => $user->getId(),
                             "name" => $user->getUsername(),
-                            "position" => $seat->getPosition(),
-                            "resource" => $this->resourceId
+                            "position" => $seat->getPosition()
                         ]
                     ];
 
@@ -238,6 +236,6 @@ class RoomTopic implements TopicInterface, SecuredTopicInterface
     */
     public function getName()
     {
-        return 'room.topic';
+        return 'community.topic';
     }
 }

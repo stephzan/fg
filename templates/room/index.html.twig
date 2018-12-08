@@ -12,14 +12,16 @@
 		<input type="hidden" id="hid_seat_tpl" value="{{ asset('room/seats.html.twig') }}" />
 		<input type="hidden" id="hid_room_id" value="{{ room.getId() }}" />
 		<input type="hidden" id="hid_nb_seats" value="{{ room.getNbSeats() }}" />
+		<input type="hidden" id="hid_player_id" value="{{ app.getUser().getId() }}" />
+		<input type="hidden" id="hid_player_resource" value="" />
 
 		<div id="cont_seats" class="col col-3 h-100 bg-primary">
 			<ul id="cont_seats_list" class="no-gutters w-100">
 				{% for seat in room.getSeats() %}
-					<li class="font-weight-bold bg-light text-dark">{{ "Seat"|trans }}: <span id="cont_seat_position_{{ seat.getPosition() }}" class="cont_seat_position">{{ seat.getPosition() }}</span></li>
-					<li class="seat_user font-weight-bold bg-light text-dark">
+					<li class="font-weight-bold bg-light text-dark seat_{{ seat.getPosition() }}">{{ "Seat"|trans }}: <span id="cont_seat_position_{{ seat.getPosition() }}" class="cont_seat_position seat_{{ seat.getPosition() }}">{{ seat.getPosition() }}</span></li>
+					<li class="seat_user font-weight-bold bg-light text-dark seat_{{ seat.getPosition() }}">
 						{{ "Player"|trans }}: <span id="cont_seat_playername_{{ seat.getPosition() }}" class="cont_seat_playername">{{ "Waiting for player"|trans }}</span>
-						<input type="hidden" id="hid_player_data_{{ seat.getPosition() }}" class="hid_player_data" data-playerid="" data-playername="">					
+						<input type="hidden" id="hid_player_data_{{ seat.getPosition() }}" class="hid_player_data" data-playerid="" data-playername="" data-resource="">					
 				{% endfor %}
 			</ul>
 		</div>
@@ -36,7 +38,10 @@
 	<script src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
 	<script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
 
-	<script type="text/javascript" src="{{ asset('js/sketches/' ~ room.getGame().getCode() ~ '/' ~ room.getGame().getCode() ~ '.js?29') }}"></script>
+	
+	<script type="text/javascript" src="{{ asset('js/sketches/checkers/checkers.js?9898') }}"></script>
+
+	{#<script type="text/javascript" src="{{ asset('js/sketches/' ~ room.getGame().getCode() ~ '/' ~ room.getGame().getCode() ~ '.js?9898') }}"></script>#}
 
 	<!-- <script type="text/javascript">
 

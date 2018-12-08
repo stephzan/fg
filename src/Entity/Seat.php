@@ -82,7 +82,7 @@ class Seat
         return $this->user_id;
     }
 
-    public function setUserId(?User $user_id): self
+    public function setUserId(?User $user_id = null): self
     {
         $this->user_id = $user_id;
 

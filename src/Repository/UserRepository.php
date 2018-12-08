@@ -56,4 +56,8 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $this->_em->persist($user);
         $this->_em->flush();
     }
+
+    public function removeElement($element){
+        $this->_em->remove($element);
+    }
 }

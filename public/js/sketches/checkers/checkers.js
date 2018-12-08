@@ -21,11 +21,14 @@ var rows = Math.floor(cnvH / cellW);
 var pawnColorLight;
 var pawnColorDark;
 
+var sideColors = ["light", "dark"];
+
 var activePawn;
 
 var target;//{Pawn that will be cathced,  Cell behind target}
 
 var dicLetters;
+var invertDicLetters;
 
 var playerOne;
 var playerTwo;
@@ -34,7 +37,15 @@ var playersIndex = 0;
 var activePlayer;
 var me;
 
-var playBothSide = true;//Set to false for test and prod
+var playBothSide = false;//Set to false for test and prod
+
+var webSocket = WS.connect("ws://127.0.0.1:8080");
+var wsSession;
+var channel;
+
+var movement = {from: {i: "", j: ""}, to: {i: "", j: ""}, player: ""};
+
+var boardInversed = false;
 
 function Cell(i, j, w, color, coord){
 	this.i = i;
@@ -165,7 +176,6 @@ Pawn.prototype.calculateOptions = function(){
 }
 Pawn.prototype.moveToTarget = function(cell){
 
-
 	//Store actual data
 	var prevI = this.i;
 	var prevJ = this.j;
@@ -197,8 +207,12 @@ Pawn.prototype.moveToTarget = function(cell){
 	}
 
 	resetActive();
-	nextPlayer();
+	nextPlayer(false);
 
+}
+Pawn.prototype.changeSide = function(){
+	this.side = (this.side === sideColors[0]) ? sideColors[1] : sideColors[0];
+	this.color = (this.color === pawnColorLight) ? pawnColorDark : pawnColorLight;
 }
 
 function centerCanvas() {
@@ -211,29 +225,63 @@ function makeGrid(cols, rows, cellW){
 	var color;
 	var letter;
 	var coord;
+	var dic = dicLetters;
+	console.log(boardInversed);
 
-	for(i = 0; i < cols; i++){	
-		letter = dicLetters.get(i+1);	
-		for(j = 0;  j< rows; j++){
-			color = ((i + j) % 2 == 0) ? cellColorLight : cellColorDark;
-			coord = letter+(rows-j);
+	if(boardInversed === true){
+		dic = invertDicLetters;
+		for(var i = 0; i < cols; i++){	
+			letter = dic.get(i+1);	
+			for(var j = (rows-1);  j >= 0; j--){
+				color = ((i + j) % 2 == 0) ? cellColorLight : cellColorDark;
+				coord = letter+(j+1);
 
-			grid[i][j] = new Cell(i, j, cellW, color, coord);
-		}	
+				grid[i][j] = new Cell(i, j, cellW, color, coord);
+			}	
+		}
+	}else{
+		for(var i = 0; i < cols; i++){	
+			letter = dic.get(i+1);	
+			for(var j = 0;  j< rows; j++){
+				color = ((i + j) % 2 == 0) ? cellColorLight : cellColorDark;
+				coord = letter+(rows-j);
+
+				grid[i][j] = new Cell(i, j, cellW, color, coord);
+			}	
+		}
 	}
+
+	
+
+	console.log(grid);
 }
 
 function addPawns(cols, rows, cellW){
 	var color;
-	for(i = 0; i < cols; i++){		
-		for(j = 0;  j< rows; j++){
-			color = (j < 4) ? pawnColorDark : pawnColorLight;
-			side = (j < 4) ? "dark" : "light";
-			if( ((j < 3)|| (j > 4))&& ((i + j) % 2 != 0) )
-				pawns[i][j] = new Pawn(i, j, cellW, color, side);
-				grid[i][j].setPawn(pawns[i][j]);//Assign pawn to cell
-		}	
-	}
+
+	if(boardInversed === true){
+		dic = invertDicLetters;
+		for(var i = 0; i < cols; i++){		
+			for(var j = rows-1;  j >= 0; j--){
+				color = (j < 4) ? pawnColorLight : pawnColorDark;
+				side = (j < 4) ? sideColors[0] : sideColors[1];
+				console.log(i+" -- "+j);
+				if( ((j < 3)|| (j > 4))&& ((i + j) % 2 != 0) )
+					pawns[i][j] = new Pawn(i, j, cellW, color, side);
+					grid[i][j].setPawn(pawns[i][j]);//Assign pawn to cell
+			}	
+		}
+	}else{
+		for(var i = 0; i < cols; i++){		
+			for(var j = 0;  j< rows; j++){
+				color = (j < 4) ? pawnColorDark : pawnColorLight;
+				side = (j < 4) ? sideColors[1] : sideColors[0];
+				if( ((j < 3)|| (j > 4))&& ((i + j) % 2 != 0) )
+					pawns[i][j] = new Pawn(i, j, cellW, color, side);
+					grid[i][j].setPawn(pawns[i][j]);//Assign pawn to cell
+			}	
+		}
+	}		
 }
 
 function setup(){	
@@ -253,6 +301,7 @@ function setup(){
 	pawns = make2DArray(cols, rows);//Set array as cols and rows
 
 	dicLetters = createStringDict({1:"A", 2:"B", 3:"C", 4:"D", 5:"E", 6:"F", 7:"G", 8:"H"});
+	invertDicLetters = createStringDict({1:"H", 2:"G", 3:"F", 4:"E", 5:"D", 6:"C", 7:"B", 8:"A"});
 
 	makeGrid(cols, rows, cellW);//Construct grid
 	addPawns(cols, rows, cellW);
@@ -273,22 +322,60 @@ function loadPlayers(){
 	var msgList = $("#cont_alert ul");
 	var roomId = $("#hid_room_id").val();
 	var roomComplete = false;
-
-	var webSocket = WS.connect("ws://127.0.0.1:8080");
+	var meId = $("#hid_player_id").val();	
+	channel = "channel/room/"+roomId+"";
 
 	webSocket.on("socket/connect", function (session) {
 	    //session is an Autobahn JS WAMP session.
 
 	    //console.log("Successfully Connected!");
 
-	    session.subscribe("channel/room/"+roomId+"", function (uri, payload) {
-            //console.log("Received message", payload);
+	    wsSession = session;
+
+	    wsSession.subscribe("channel/room/"+roomId+"", function (uri, payload) {
+            console.log("Received message", payload);
             //msgList.append("<li>"+payload.msg+"</li>");
             if(payload.msg.includes("api_instruction")){
             	var resp = JSON.parse(payload.msg);
             	var instruction = resp.comm.instruction;
             	switch(instruction){
+            		default:
+            			console.log("Bad instruction: "+instruction);
+            			break;
+            		case "subscribe":
+            			var data = resp.data;
+            			var idPlayer = $("#hid_player_id").val();
+            			
+            			resourceId = data.resourceId;
+            			$("#hid_player_resource").val(resourceId);
+
+            			var instruction = {type: "api_instruction", msg: "register", data: idPlayer};
+            			session.publish(channel, instruction);
+            			break;
+            		case "register":
+            			var data = resp.data;
+            			$("#cont_alert ul").append("<li>"+data.player.player.name+" is conneccted</li>");
+            			var instruction = {type: "api_instruction", msg: "loadUserList"};
+            			session.publish(channel, instruction);
+            			break;
+            		case "setMovement":
+            			console.log("SM");
+            			var data = resp.data;
+            			console.log(data);
+            			if(data.player.id != me.id){
+            				var pawn = pawns[data.from.i][data.from.j];
+            				var target = grid[data.to.i][data.to.j];
+
+            				pawn.moveToTarget(target);
+            			}
+            			break;
+            		case "nextPlayer":
+            		console.log("NP");
+            		//TODO: fucking bug with nextPlayer
+            			nextPlayer(true);
+            			break;
             		case "loadUserList":
+            		console.log(resp.users);
             			var nbPlayers = resp.users.length;
             			var nbSeats = $("#hid_nb_seats").val();
 
@@ -297,30 +384,48 @@ function loadPlayers(){
             				var playerName = resp.users[i].name;
             				var playerPosition = resp.users[i].position;
 
+            				resp.users[i].me = false;
+
+            				if(resp.users[i].id == meId){
+            					resp.users[i].me = true;
+            				}
+
             				$("#cont_seat_playername_"+resp.users[i].position+"").html(resp.users[i].name);
             				$("#hid_player_data_"+resp.users[i].position+"").attr("data-playername", resp.users[i].name);
             				$("#hid_player_data_"+resp.users[i].position+"").attr("data-playerid", resp.users[i].id);
 
             				players.push(resp.users[i]);
+
+            				if(resp.users[i].me === true){
+            					me = resp.users[i];
+            				}
             			}
 
             			if(nbPlayers == nbSeats){
             				roomComplete = true;
-            				players[0].side = "light";
-            				players[1].side = "dark";
-            				activePlayer = players[0];
+            				players[0].side = sideColors[0];
+            				players[1].side = sideColors[1];
+            				activePlayer = players[playersIndex];
+
+            				//console.log(me);
+            				console.log(activePlayer);
+
+            				if(me.side === sideColors[1]){
+            					swap();
+            				}  
+
+            				//console.log(pawns);     	
             			}
 
             			if(roomComplete === true){
-            				session.publish("channel/room/"+roomId+"", "Game start");
+            				wsSession.publish(channel, {type: "communication", msg: "Game start"});
             			}else{
-            				session.publish("channel/room/"+roomId+"", "Waiting player");
+            				wsSession.publish(channel, {type: "communication", msg: "Waiting player"});
             			}
             			break;
             	}
-            }                        
+            }                      
         });
-
 	});
 
 	webSocket.on("socket/disconnect", function (error) {
@@ -330,129 +435,49 @@ function loadPlayers(){
 	});
 }
 
-/*function loadPlayers(){
-	var webSocket = WS.connect("ws://127.0.0.1:8080");
-	roomId = $("#hid_room_id").val();
-	nbSeats = $("#hid_nb_seats").val();	
+function swap(){
+	boardInversed = true;
+	makeGrid(cols, rows, cellW);//Construct grid
+	addPawns(cols, rows, cellW);
 
-	webSocket.on("socket/connect", function (session) {
-		session.subscribe("channel/room/"+roomId+"", function(uri, payload){
-			//console.log(uri);
-			console.log(payload.msg);
-
-			var pl = JSON.parse(payload.msg);
-			var type = "text";		
-			var instruction = "";	
-			if(pl.comm.type !== undefined){
-				type = pl.comm.type;
-				instruction = pl.comm.instruction;
-
-				console.log(type+": "+instruction);
+	cnv.redraw();
+	//$("#board canvas").addClass("rotate");
+	/*for(var i = 0; i < cols; i++){
+		for(var j = 0; j < rows; j++){
+			if(pawns[i][j] != undefined){
+				pawns[i][j].changeSide();
 			}
-
-			switch(type){
-				default:
-				case "text":
-					$("#cont_alert").html(payload.msg);
-					$("#cont_alert").show();
-					setTimeout('$("#cont_alert").hide()', 2000);
-					break;
-				case "api_instruction":
-					switch(pl.comm.instruction){
-						case "loadUserList":
-							var users = pl.users;
-							for(var i = 0; i<users.length; i++){
-								console.log(users[i]);
-
-								$("#cont_seat_playername_"+users[i].position+"").html(users[i].name);
-								$("#hid_player_data_"+users[i].position+"").attr("data-playername", users[i].name);
-								$("#hid_player_data_"+users[i].position+"").attr("data-playerid", users[i].id);
-
-								players.push(users[i]);
-							}
-
-							console.log(players);
-							console.log(players.length);
-							console.log(users);
-							console.log(parseInt(nbSeats));
-
-							if(players.length === parseInt(nbSeats)){
-								tableComplete = true;
-								console.log("complete");
-							}
-							break;
-					}
-					break;
-
-			}
-
-			console.log(tableComplete);
-			if(tableComplete === true){
-				//Start game
-				players[0].side = "light";
-				players[1].side = "dark";
-
-				activePlayer = players[playersIndex];
-				console.log(activePlayer);
-			}else{
-				var loadPlayersMsg = {type: "api_instruction", msg: "loadUserList"};
-		    	session.publish("channel/room/"+roomId+"", loadPlayersMsg);
-			}						
-		})			
-		var loadPlayersMsg = {type: "api_instruction", msg: "loadUserList"};
-    	session.publish("channel/room/"+roomId+"", loadPlayersMsg);
-	});
-}*/
-
-/*function loadPlayers(){	
-	var nbSeats = $("#hid_nbseats").val();
-	var playerData = $(".hid_player_data");	
-
-	if(playerData.length === 0){
-		setTimeout("loadPlayers();", 2000);
-	}else{
-		$.each(playerData, function(){
-			var playerId = $(this).attr("data-playerid");
-			var playerName = $(this).attr("data-playername");
-			var player = {id: playerId, name: playerName, side: ""};
-			
-			var playerLoaded = false;
-			$.each(players, function(){
-				if(this.id === playerId){
-					playerLoaded = true;
-				}
-			})
-
-			if(playerLoaded === false){
-				players.push(player);
-			}
-
-		})
-
-		var roomComplete = (nbSeats === playerData.length);
-
-		if(roomComplete === false){
-			setTimeout("loadPlayers();", 2000);
-			//console.log(players);
-		}else{
-			//Start game
-			activeplayer = players[playersIndex];
 		}
-	}	
-}*/
+	}*/
+}
 
-function nextPlayer(){
-	var nextIndex = playersIndex+1;//Increment index
+function highlightActiveplayer(){
+	var pos = activePlayer.position;
 
-	if(players[nextIndex] !== undefined){
-		playersIndex++;	
+	//TODO: change style of active player row
+	/*$(".seat_"+pos+"").removeClass("bg-light");
+	$(".seat_"+pos+"").css("backgroundColor", "lightgreen");*/
+}
+
+function nextPlayer(wsInstruction){
+	if(wsInstruction !== undefined&& wsInstruction === true){
+		var nextIndex = playersIndex+1;//Increment index
+
+		if(players[nextIndex] !== undefined){
+			playersIndex++;	
+		}else{
+			playersIndex = 0;
+		}
+
+		activePlayer = players[playersIndex];
+
+		highlightActiveplayer();
+
+		console.log(activePlayer);
 	}else{
-		playersIndex = 0;
-	}
-
-	activePlayer = players[playersIndex];
-
-	console.log(activePlayer);
+		wsSession.publish(channel, {type: "api_instruction", msg: "setMovement", data: movement});
+		wsSession.publish(channel, {type: "api_instruction", msg: "nextPlayer"});
+	}	
 }
 
 function resetActive(){
@@ -474,16 +499,24 @@ function mousePressed(){
 	/* if click on pawn */	
 	for(i = 0; i < cols; i++){
 		for(j = 0;  j< rows; j++){			
-			if(pawns[i][j] !== undefined&& pawns[i][j].side === activePlayer.side){
+			if(pawns[i][j] !== undefined&& activePlayer.me === true){
 				if(playBothSide === false){
-					if(activePlayer === me){
-						if(pawns[i][j].contains(mouseX, mouseY)){					
-							pawns[i][j].calculateOptions();
-						}
+					if(pawns[i][j].contains(mouseX, mouseY)){					
+						console.log(pawns[i][j]);
+						
+						movement.player = activePlayer;
+						movement.from.i = j;			
+						movement.from.j = i;
+
+						pawns[i][j].calculateOptions();							
 					}
 				}else{
-					if(pawns[i][j].contains(mouseX, mouseY)){					
-						pawns[i][j].calculateOptions();
+					if(pawns[i][j].contains(mouseX, mouseY)){	
+						movement.player = activePlayer;
+						movement.from.i = j;			
+						movement.from.j = i;
+
+						pawns[i][j].calculateOptions();						
 					}
 				}				
 			}
@@ -497,6 +530,9 @@ function mousePressed(){
 			console.log("Target: " + cell.coord);
 			var pawn = activePawn;
 			cell.pawn = pawn;
+
+			movement.to.i = cell.i;
+			movement.to.j = cell.j;
 
 			pawn.moveToTarget(cell);
 
